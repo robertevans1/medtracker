@@ -6,12 +6,16 @@
  */
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
 
 import Home from './home/home';
+import {NavigationContainer} from '@react-navigation/native';
 
 function App(): React.JSX.Element {
-  return <Home />;
+  return (
+    <NavigationContainer>
+      <Home />
+    </NavigationContainer>
+  );
 }
 
 export default App;
