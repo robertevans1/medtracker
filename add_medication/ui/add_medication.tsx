@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  Text,
-  View,
-  useColorScheme,
-} from 'react-native';
+import {Text, View, useColorScheme} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 function AddMedication(): React.JSX.Element {

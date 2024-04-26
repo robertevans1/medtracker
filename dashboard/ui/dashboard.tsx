@@ -3,11 +3,15 @@ import {
   SafeAreaView,
   ScrollView,
   StatusBar,
+  StyleSheet,
   Text,
   View,
   useColorScheme,
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {useMedications} from '../context/medication_context';
+import Medication from '../../domain/medication';
+import styles from '../../styles/styles';
 
 function Dashboard(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -16,15 +20,16 @@ function Dashboard(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const medications = useMedications();
+
   return (
-    <View
-      style={{
-        backgroundColor: isDarkMode ? Colors.black : Colors.white,
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text>The Dashboard</Text>
+    <View style={styles.tabViewStyle}>
+      <Text>Medications:</Text>
+      <View>
+        {medications.map(medication => (
+          <Text key={medication.id}>- {medication.name}</Text>
+        ))}
+      </View>
     </View>
   );
 }

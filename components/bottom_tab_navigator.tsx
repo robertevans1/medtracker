@@ -2,6 +2,7 @@ import React from 'react';
 import Icon from 'react-native-vector-icons/Entypo';
 import Dashboard from '../dashboard/ui/dashboard';
 import AddMedication from '../add_medication/ui/add_medication';
+import Calendar from '../calendar/ui/calendar';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 // Create the TabNavigator
@@ -18,6 +19,17 @@ const BottomTabNavigator = () => {
             <Icon name="home" size={size} color={color} />
           ),
           tabBarLabel: 'Dashboard',
+          headerShown: false,
+        }}
+      />
+      <Tab.Screen
+        name="Calendar"
+        component={Calendar}
+        options={{
+          tabBarIcon: ({color, size}) => (
+            <Icon name="calendar" size={size} color={color} />
+          ),
+          tabBarLabel: 'Calendar',
           headerShown: false,
         }}
       />

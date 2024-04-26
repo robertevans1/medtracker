@@ -9,12 +9,15 @@ import React from 'react';
 
 import Home from './home/home';
 import {NavigationContainer} from '@react-navigation/native';
+import {MedicationProvider} from './dashboard/context/medication_context';
 
 function App(): React.JSX.Element {
   return (
-    <NavigationContainer>
-      <Home />
-    </NavigationContainer>
+    <MedicationProvider>
+      <NavigationContainer>
+        <Home />
+      </NavigationContainer>
+    </MedicationProvider>
   );
 }
 

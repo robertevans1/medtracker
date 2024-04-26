@@ -1,6 +1,8 @@
 import {
   StyleSheet,
+  useColorScheme,
 } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 const styles = StyleSheet.create({
     sectionContainer: {
@@ -19,6 +21,18 @@ const styles = StyleSheet.create({
     highlight: {
       fontWeight: '700',
     },
+    viewStyle: {
+      flex: 1,
+      backgroundColor: Colors.black,
+      justifyContent: 'flex-end',
+    },
+    tabViewStyle: {
+      backgroundColor: Colors.black,
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
   });
 
   export default styles;
