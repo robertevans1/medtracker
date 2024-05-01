@@ -30,7 +30,7 @@ class Medication {
     timesOfDoses: Array<Date>;
     totalDoses: number;
     doseStatuses: Array<DoseStatus> = [];
-    firstDoseTime: Date;
+    firstDoseIndex: number; // index of the first dose in the timesOfDoses array
   
     constructor(params: {
       id: string,
@@ -40,7 +40,7 @@ class Medication {
       timesOfDoses: Array<Date>,
       totalDoses: number,
       dozeStatuses?: Array<DoseStatus>
-      firstDoseTime: Date,
+      firstDoseIndex: number,
     }) {
       this.id = params.id;
       this.name = params.name;
@@ -48,7 +48,7 @@ class Medication {
       this.mgPerTablet = params.mgPerTablet;
       this.timesOfDoses = params.timesOfDoses;
       this.totalDoses = params.totalDoses;
-      this.firstDoseTime = params.firstDoseTime;
+      this.firstDoseIndex = params.firstDoseIndex;
       this.doseStatuses = params.dozeStatuses || Array(this.totalDoses).fill(DoseStatus.Future);
 
       console.log('Medication created:', this);
@@ -81,9 +81,9 @@ class Medication {
     }
 
     getDoseStatusesWithTime(): Array<DoseStatusWithTime>{
-      console.log('start getDoseStatusesWithTime firstDoseTime:', this.firstDoseTime, 'timesOfDoses:', this.timesOfDoses);
+      console.log('start getDoseStatusesWithTime firstDoseIndex:', this.firstDoseIndex, 'timesOfDoses:', this.timesOfDoses);
       const doseStatusesWithTime = [];
-      let time = this.firstDoseTime;
+      let time = this.timesOfDoses[this.firstDoseIndex];
       let now = new Date();
 
       for(let doseIndex = 0; doseIndex < this.totalDoses; doseIndex++) {
@@ -98,6 +98,7 @@ class Medication {
           }
 
           let doseStatus = this.doseStatuses[doseIndex];
+
           // If dose is in the past and status is future, update status to unknown
           if(time < now && doseStatus === DoseStatus.Future) {
             doseStatus = DoseStatus.Unknown;
