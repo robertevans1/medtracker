@@ -27,7 +27,13 @@ function Dashboard(): React.JSX.Element {
       <Text>Medications:</Text>
       <View>
         {medications.map(medication => (
-          <Text key={medication.id}>- {medication.name}</Text>
+          <Text key={medication.id}>
+            {'Name: '} {medication.name} {'\n'}
+            {'Previous: '}
+            {medication.getPreviousStatusWithTime()?.toString()} {'\n'}
+            {' Next: '}
+            {medication.getNextStatusWithTime()?.toString()}
+          </Text>
         ))}
       </View>
     </View>
