@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-end',
     },
     tabViewStyle: {
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',

@@ -9,8 +9,6 @@ import {
 } from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import BottomTabNavigator from '../components/bottom_tab_navigator';
-import Dashboard from '../dashboard/ui/dashboard';
-import AddMedication from '../add_medication/ui/add_medication';
 import styles from '../styles/styles';
 
 function Home(): React.JSX.Element {
