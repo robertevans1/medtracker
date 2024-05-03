@@ -102,4 +102,71 @@ describe("MedicationsService", () => {
     expect(JSON.stringify(fetchedMedication)).toEqual(JSON.stringify(medication));
 
   });
+
+  test("removing a medication should remove it from the database", async () => {
+    const medication: Medication = new Medication({
+      name: "Medication 3",
+      mgPerDose: 30,
+      mgPerTablet: 300,
+      timesOfDoses: [new Date()],
+      firstDoseIndex: 0,
+      doseStatuses: [
+        DoseStatus.Future,
+        DoseStatus.Missed,
+        DoseStatus.Taken,
+      ] as Array<DoseStatus>
+    });
+
+    const insertId = await MedicationsService.saveMedication(medication, db);
+
+    await MedicationsService.removeMedication(insertId, db);
+
+    const medications = await MedicationsService.getAllMedications(db);
+
+    const fetchedMedication = medications.find(
+      (med) => med.id === insertId
+    );
+
+    expect(fetchedMedication).toBeUndefined();
+  });
+
+  test("Updating a medication should update it in the database", async () => {
+    const medication: Medication = new Medication({
+      name: "Medication 4",
+      mgPerDose: 40,
+      mgPerTablet: 400,
+      timesOfDoses: [new Date()],
+      firstDoseIndex: 0,
+      doseStatuses: [
+        DoseStatus.Future,
+        DoseStatus.Missed,
+        DoseStatus.Taken,
+      ] as Array<DoseStatus>
+    });
+
+    const insertId = await MedicationsService.saveMedication(medication, db);
+
+    const medications = await MedicationsService.getAllMedications(db);
+
+    const fetchedMedication = medications.find(
+      (med) => med.id === insertId
+    );
+
+    expect(fetchedMedication).toBeDefined();
+
+    fetchedMedication!.name = "Updated Medication 4";
+    fetchedMedication!.mgPerDose = 50;
+
+    await MedicationsService.updateMedication(fetchedMedication!, db);
+
+    const updatedMedications = await MedicationsService.getAllMedications(db);
+
+    const updatedMedication = updatedMedications.find(
+      (med) => med.id === insertId
+    );
+
+    expect(updatedMedication).toBeDefined();
+    expect(updatedMedication!.name).toEqual("Updated Medication 4");
+    expect(updatedMedication!.mgPerDose).toEqual(50);
+  });
 });
