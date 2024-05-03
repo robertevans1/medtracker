@@ -28,7 +28,7 @@ class Medication {
   mgPerTablet: number;
   timesOfDoses: Array<Date>;
   doseStatuses: Array<DoseStatus>;
-  firstDoseIndex: number; // index of the first dose in the timesOfDoses array
+  firstDoseIndex: number; 
 
   constructor(params: {
     id?: number;

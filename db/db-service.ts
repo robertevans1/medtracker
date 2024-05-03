@@ -155,6 +155,88 @@ const MedicationsService = {
       });
     });
   },
+
+  // Update medication and associated dose statuses
+  updateMedication: (medication: Medication, db: SQLiteDatabase) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          `UPDATE medications SET name = ?, mgPerDose = ?, mgPerTablet = ?, timesOfDoses = ?, firstDoseIndex = ?
+                     WHERE id = ?`,
+          [
+            medication.name,
+            medication.mgPerDose,
+            medication.mgPerTablet,
+            JSON.stringify(
+              medication.timesOfDoses.map((date) => date.toISOString())
+            ),
+            medication.firstDoseIndex,
+            medication.id,
+          ],
+          (_, { rowsAffected }) => {
+            resolve(rowsAffected);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+        // Delete all dose statuses for the medication
+        tx.executeSql(
+          `DELETE FROM dose_statuses WHERE medication_id = ?`,
+          [medication.id],
+          (_, { rowsAffected }) => {
+            // Dose statuses deleted
+          },
+          (_, error) => {
+            console.error("Error deleting dose statuses:", error);
+          }
+        );
+        // Insert new dose statuses for the medication
+        medication.doseStatuses.forEach((status: DoseStatus) => {
+          tx.executeSql(
+            `INSERT INTO dose_statuses (medication_id, status)
+                             VALUES (?, ?)`,
+            [medication.id, status],
+            (_, { insertId }) => {
+              // Dose status inserted successfully
+            },
+            (_, error) => {
+              console.error("Error inserting dose status:", error);
+            }
+          );
+        });
+      });
+    });
+  },
+
+  // Remove a medication and associated dose statuses
+  removeMedication: (medicationId: number, db: SQLiteDatabase) => {
+    return new Promise((resolve, reject) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          `DELETE FROM medications WHERE id = ?`,
+          [medicationId],
+          (_, { rowsAffected }) => {
+            resolve(rowsAffected);
+          },
+          (_, error) => {
+            reject(error);
+          }
+        );
+        tx.executeSql(
+          `DELETE FROM dose_statuses WHERE medication_id = ?`,
+          [medicationId],
+          (_, { rowsAffected }) => {
+            // Dose statuses deleted
+          },
+          (_, error) => {
+            console.error("Error deleting dose statuses:", error);
+          }
+        );
+      });
+    });
+  },
 };
+
 
 export { MedicationsService };
