@@ -1,9 +1,10 @@
-import React from 'react';
-import {Text, View, useColorScheme} from 'react-native';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import React from "react";
+import { Text, View, useColorScheme } from "react-native";
+import { Colors } from "react-native/Libraries/NewAppScreen";
+import MedicationForm from "./medication_form";
 
 function AddMedication(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === "dark";
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -14,10 +15,11 @@ function AddMedication(): React.JSX.Element {
       style={{
         backgroundColor: isDarkMode ? Colors.black : Colors.white,
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text>The Add Meds screen</Text>
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <MedicationForm />
     </View>
   );
 }
