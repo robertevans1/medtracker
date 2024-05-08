@@ -1,7 +1,5 @@
 import {
-  connectToDatabase,
-  createTables,
-  dropTables,
+  connectToTestDatabase,
   MedicationsService,
 } from "../../db/db-service";
 import Medication, { DoseStatus } from "../../domain/medication";
@@ -13,11 +11,7 @@ describe("MedicationsService", () => {
   let db: SQLiteDatabase;
 
   beforeAll(async () => {
-    db = SQLiteExecutor.openDatabase(
-      "medications.db"
-    ) as unknown as SQLiteDatabase;
-    await dropTables(db);
-    await createTables(db);
+    db = await connectToTestDatabase();
   });
 
   afterEach(() => {

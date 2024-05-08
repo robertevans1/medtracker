@@ -3,6 +3,18 @@ import Medication from "../../domain/medication";
 import moment from "moment";
 
 class DummyMedicationRepository implements MedicationRepository {
+  addMedication(medication: Medication): Promise<void> {
+    // Here you would typically add the medication to a database or API,
+    // but for demonstration purposes, we'll just log the medication
+    console.log("Adding medication:", medication);
+    return Promise.resolve();
+  }
+  removeMedication(medication_id: number): Promise<void> {
+    // Here you would typically remove the medication from a database or API,
+    // but for demonstration purposes, we'll just log the medication_id
+    console.log("Removing medication with id:", medication_id);
+    return Promise.resolve();
+  }
   async fetchMedicationsForUser(userId: string): Promise<Medication[]> {
     // Here you would typically fetch medications from a database or API based on the userId,
     // but for demonstration purposes, we'll just return dummy data
@@ -10,7 +22,7 @@ class DummyMedicationRepository implements MedicationRepository {
     // Dummy medications
     const medications: Medication[] = [
       new Medication({
-        id: "1",
+        id: 1,
         name: "Lymecycline",
         mgPerDose: 408,
         mgPerTablet: 408,

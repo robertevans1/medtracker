@@ -1,5 +1,5 @@
 import { Database } from "sqlite3";
-import { ResultSet } from "react-native-sqlite-storage";
+import { ResultSet, SQLiteDatabase } from "react-native-sqlite-storage";
 import { TransactionExecutor } from "./transaction-executor";
 const sqlite3 = require("sqlite3").verbose();
 

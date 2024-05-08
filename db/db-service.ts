@@ -12,14 +12,13 @@ import { DoseStatus } from "../domain/medication";
 enablePromise(true);
 
 export const connectToDatabase = async () => {
-  return openDatabase(
-    { name: "medications.db", location: "default" },
-    () => {},
-    (error) => {
-      console.error(error);
-      throw Error("Could not connect to database");
-    }
-  );
+  let db = await openDatabase({
+    name: "medications.db",
+    location: "default",
+  });
+  await dropTables(db); // temp while testing
+  await createTables(db);
+  return db;
 };
 
 export const createTables = async (db: SQLiteDatabase) => {
@@ -71,9 +70,10 @@ const MedicationsService = {
   saveMedication: (medication: Medication, db: SQLiteDatabase) => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
+        console.log('attempt to insert medication')
         tx.executeSql(
           `INSERT INTO medications (name, mgPerDose, mgPerTablet, timesOfDoses, firstDoseIndex)
-                     VALUES (?, ?, ?, ?, ?) RETURNING id`,
+                     VALUES (?, ?, ?, ?, ?)`,
           [
             medication.name,
             medication.mgPerDose,
@@ -85,6 +85,7 @@ const MedicationsService = {
           ],
           (_, { insertId }) => {
             // Insert dose statuses for the medication
+            console.log('attempt to insert dose statuses at medication id:', insertId, 'with statuses:', medication.doseStatuses)
             medication.doseStatuses.forEach((status: DoseStatus) => {
               tx.executeSql(
                 `INSERT INTO dose_statuses (medication_id, status)
@@ -92,6 +93,7 @@ const MedicationsService = {
                 [insertId, status],
                 (_, { insertId: statusId }) => {
                   // Dose status inserted successfully
+                  console.log('dose status inserted successfully:', statusId)
                 },
                 (_, error) => {
                   console.error("Error inserting dose status:", error);
@@ -101,6 +103,7 @@ const MedicationsService = {
             resolve(insertId);
           },
           (_, error) => {
+            console.error("Error saving medication:", error);
             reject(error);
           }
         );

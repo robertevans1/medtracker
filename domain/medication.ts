@@ -40,17 +40,38 @@ class Medication {
     doseStatuses?: Array<DoseStatus>;
     firstDoseIndex: number;
   }) {
+
+    // print the types of the parameters
+    console.log("id is ", typeof(params.id));
+    console.log("name is ", typeof(params.name));
+    console.log("mgPerDose is ", typeof(params.mgPerDose));
+    console.log("mgPerTablet is ", typeof(params.mgPerTablet));
+    console.log("timesOfDoses is ", typeof(params.timesOfDoses));
+    console.log("totalDoses is ", typeof(params.totalDoses), "totalDoses ", params.totalDoses);
+    console.log("doseStatuses is ", typeof(params.doseStatuses), "doseStatuses ", params.doseStatuses);
+    console.log("firstDoseIndex is ", typeof(params.firstDoseIndex));
+
     this.id = params.id;
     this.name = params.name;
     this.mgPerDose = params.mgPerDose;
     this.mgPerTablet = params.mgPerTablet;
     this.timesOfDoses = params.timesOfDoses;
     this.firstDoseIndex = params.firstDoseIndex;
+  
 
-    console.log("params doseStatuses:", params.doseStatuses);
+    if (!params.totalDoses && !params.doseStatuses) {
+      throw new Error("Both totalDoses and doseStatuses are undefined.");
+    }
 
-    this.doseStatuses =
-      params.doseStatuses || Array(params.totalDoses).fill(DoseStatus.Future);
+    if(params.doseStatuses !== undefined){
+      console.log("Dose statuses are provided");
+      this.doseStatuses = params.doseStatuses;
+    } else {
+      console.log("Dose statuses are not provided, total doses is ", params.totalDoses);
+      console.log("type of total doses is ", typeof(params.totalDoses));
+      this.doseStatuses = Array<DoseStatus>(params.totalDoses!).fill(DoseStatus.Future);
+      console.log("Dose statuses are ", this.doseStatuses, "dose statuses length is ", this.doseStatuses.length);
+    }
 
     console.log("Medication created:", this);
   }
@@ -82,12 +103,6 @@ class Medication {
   }
 
   getDoseStatusesWithTime(): Array<DoseStatusWithTime> {
-    console.log(
-      "start getDoseStatusesWithTime firstDoseIndex:",
-      this.firstDoseIndex,
-      "timesOfDoses:",
-      this.timesOfDoses
-    );
     const doseStatusesWithTime = [];
     let time = this.timesOfDoses[this.firstDoseIndex];
     let now = new Date();
