@@ -5,8 +5,9 @@ import Medication from "../../domain/medication";
 import SqlMedicationRepository from "../repository/sql_medication_repository";
 import { connectToDatabase } from "../../db/db-service";
 
-interface MedicationController {
+export interface MedicationController {
   addMedication: (medication: Medication) => Promise<void>;
+  updateMedication: (medication: Medication) => Promise<void>;
   removeMedication: (medication_id: number) => Promise<void>;
 }
 
@@ -20,6 +21,7 @@ const MedicationContext = createContext<MedicationContextType>({
   medications: [],
   medicationController: {
     addMedication: async () => {},
+    updateMedication: async () => {},
     removeMedication: async () => {},
   },
 });
@@ -61,6 +63,15 @@ export const MedicationProvider: React.FC<{ children: React.ReactNode }> = ({
     setMedications(updatedMedications);
   };
 
+  const updateMedication = async (medication: Medication) => {
+    // Update medication in repository
+    await repository.updateMedication(medication);
+    // Fetch updated medications from repository
+    const updatedMedications = await fetchMedicationsFromRepository();
+    // Update medications in state
+    setMedications(updatedMedications);
+  };
+
   const removeMedication = async (medication_id: number) => {
     // Remove medication from repository
     await repository.removeMedication(medication_id);
@@ -72,6 +83,7 @@ export const MedicationProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const medicationController: MedicationController = {
     addMedication,
+    updateMedication,
     removeMedication,
   };
 

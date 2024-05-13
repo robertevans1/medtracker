@@ -99,7 +99,7 @@ const MedicationForm: React.FC = () => {
     <View>
       <Text>Name:</Text>
       <TextInput
-        value={medication.name}
+        value={medication.name || ""}
         onChangeText={(value) => handleInputChange("name", value)}
       />
 

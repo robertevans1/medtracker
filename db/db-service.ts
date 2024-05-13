@@ -16,7 +16,7 @@ export const connectToDatabase = async () => {
     name: "medications.db",
     location: "default",
   });
-  await dropTables(db); // temp while testing
+  // await dropTables(db); // temp while testing
   await createTables(db);
   return db;
 };
@@ -37,7 +37,8 @@ export const createTables = async (db: SQLiteDatabase) => {
      CREATE TABLE IF NOT EXISTS dose_statuses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         medication_id INTEGER,
-        status TEXT,
+        position INTEGER,
+        type TEXT,
         FOREIGN KEY (medication_id) REFERENCES medications(id)
      )
     `;
@@ -88,9 +89,9 @@ const MedicationsService = {
             console.log('attempt to insert dose statuses at medication id:', insertId, 'with statuses:', medication.doseStatuses)
             medication.doseStatuses.forEach((status: DoseStatus) => {
               tx.executeSql(
-                `INSERT INTO dose_statuses (medication_id, status)
-                                 VALUES (?, ?)`,
-                [insertId, status],
+                `INSERT INTO dose_statuses (medication_id, type, position)
+                                 VALUES (?, ?, ?)`,
+                [insertId, status.type, status.index],
                 (_, { insertId: statusId }) => {
                   // Dose status inserted successfully
                   console.log('dose status inserted successfully:', statusId)
@@ -115,9 +116,9 @@ const MedicationsService = {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          `SELECT m.*, ds.status 
-                     FROM medications m
-                     LEFT JOIN dose_statuses ds ON m.id = ds.medication_id`,
+          `SELECT m.*, ds.type, ds.position 
+               FROM medications m
+               LEFT JOIN dose_statuses ds ON m.id = ds.medication_id`,
           [],
           (_, { rows }) => {
             const medicationsMap = new Map();
@@ -127,6 +128,12 @@ const MedicationsService = {
 
               const medicationId = row.id;
               if (!medicationsMap.has(medicationId)) {
+                let doseStatuses = [];
+                doseStatuses.push({
+                  type: row.type,
+                  index: row.position,
+                });
+
                 // Create new medication object
                 const medication = new Medication({
                   id: row.id,
@@ -138,13 +145,15 @@ const MedicationsService = {
                   ),
                   totalDoses: row.totalDoses,
                   firstDoseIndex: row.firstDoseIndex,
-                  doseStatuses: [] as DoseStatus[], // Initialize dose statuses array
+                  doseStatuses: doseStatuses, // Initialize dose statuses array
                 });
                 medicationsMap.set(medicationId, medication);
-              }
-              // Add dose status to medication's dose statuses array
-              if (row.status) {
-                medicationsMap.get(medicationId).doseStatuses.push(row.status);
+              } else {
+                // Add dose status to existing medication
+                medicationsMap.get(medicationId).doseStatuses.push({
+                  type: row.type,
+                  index: row.position,
+                });
               }
             }
             // Convert medications map to array
@@ -197,9 +206,9 @@ const MedicationsService = {
         // Insert new dose statuses for the medication
         medication.doseStatuses.forEach((status: DoseStatus) => {
           tx.executeSql(
-            `INSERT INTO dose_statuses (medication_id, status)
-                             VALUES (?, ?)`,
-            [medication.id, status],
+            `INSERT INTO dose_statuses (medication_id, type, position)
+                             VALUES (?, ?, ?)`,
+            [medication.id, status.type, status.index],
             (_, { insertId }) => {
               // Dose status inserted successfully
             },

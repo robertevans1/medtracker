@@ -21,6 +21,11 @@ class SqlMedicationRepository implements MedicationRepository {
     await MedicationsService.saveMedication(medication, db);
   }
 
+  async updateMedication(medication: Medication): Promise<void> {
+    let db = await this.dbPromise;
+    await MedicationsService.updateMedication(medication, db);
+  }
+
   async removeMedication(medication_id: number): Promise<void> {
     let db = await this.dbPromise;
     await MedicationsService.removeMedication(medication_id, db);

@@ -1,23 +1,28 @@
-enum DoseStatus {
+export enum DoseStatusType {
   Taken = "taken",
   Missed = "missed",
   Unknown = "unknown",
   Future = "future",
 }
 
-class DoseStatusWithTime {
-  doseStatus: DoseStatus;
-  date: Date;
+class DoseStatus {
+  type: DoseStatusType;
+  index: number;
+  date?: Date;
 
-  constructor(params: { doseStatus: DoseStatus; date: Date }) {
-    this.doseStatus = params.doseStatus;
+  constructor(params: { type: DoseStatusType; index: number, date?: Date }) {
+    this.type = params.type;
+    this.index = params.index;
     this.date = params.date;
   }
 
+  static future(index: number): DoseStatus {
+    return new DoseStatus({ type: DoseStatusType.Future, index: index });
+  }
+
+  // print type and date of the dose status
   toString(): string {
-    return `${
-      this.doseStatus
-    } at ${this.date.toLocaleTimeString()} on ${this.date.toDateString()}`;
+    return `${this.type} ${this.date}`;
   }
 }
 
@@ -64,24 +69,28 @@ class Medication {
     }
 
     if(params.doseStatuses !== undefined){
-      console.log("Dose statuses are provided");
+      console.log("Dose statuses are provided as ", params.doseStatuses);
       this.doseStatuses = params.doseStatuses;
     } else {
       console.log("Dose statuses are not provided, total doses is ", params.totalDoses);
       console.log("type of total doses is ", typeof(params.totalDoses));
-      this.doseStatuses = Array<DoseStatus>(params.totalDoses!).fill(DoseStatus.Future);
+      this.doseStatuses = [];
+      for(let i = 0; i < params.totalDoses!; i++){
+        this.doseStatuses.push(DoseStatus.future(i));
+      }
+
       console.log("Dose statuses are ", this.doseStatuses, "dose statuses length is ", this.doseStatuses.length);
     }
 
     console.log("Medication created:", this);
   }
 
-  getPreviousStatusWithTime(): DoseStatusWithTime | null {
+  getPreviousStatusWithTime(): DoseStatus | null {
     const doseStatusesWithTime = this.getDoseStatusesWithTime();
     const now = new Date();
 
     for (let i = 0; i < doseStatusesWithTime.length; i++) {
-      if (doseStatusesWithTime[i].date > now) {
+      if (doseStatusesWithTime[i].date! > now) {
         return i > 0 ? doseStatusesWithTime[i - 1] : null;
       }
     }
@@ -89,12 +98,14 @@ class Medication {
     return null;
   }
 
-  getNextStatusWithTime(): DoseStatusWithTime | null {
+
+
+  getNextStatusWithTime(): DoseStatus | null {
     const doseStatusesWithTime = this.getDoseStatusesWithTime();
     const now = new Date();
 
     for (let i = 0; i < doseStatusesWithTime.length; i++) {
-      if (doseStatusesWithTime[i].date > now) {
+      if (doseStatusesWithTime[i].date! > now) {
         return doseStatusesWithTime[i];
       }
     }
@@ -102,7 +113,7 @@ class Medication {
     return null;
   }
 
-  getDoseStatusesWithTime(): Array<DoseStatusWithTime> {
+  getDoseStatusesWithTime(): Array<DoseStatus> {
     const doseStatusesWithTime = [];
     let time = this.timesOfDoses[this.firstDoseIndex];
     let now = new Date();
@@ -133,16 +144,17 @@ class Medication {
         let doseStatus = this.doseStatuses[doseIndex];
 
         // If dose is in the past and status is future, update status to unknown
-        if (time < now && doseStatus === DoseStatus.Future) {
-          doseStatus = DoseStatus.Unknown;
+        if (time < now && doseStatus.type === DoseStatusType.Future) {
+          doseStatus.type = DoseStatusType.Unknown;
         }
 
-        const doseStatusWithTime = new DoseStatusWithTime({
-          doseStatus: doseStatus,
+        const doseStatusWithTime = new DoseStatus({
+          type: doseStatus.type,
+          index: doseStatus.index,
           date: time,
         });
+
         doseStatusesWithTime.push(doseStatusWithTime);
-        console.log(doseStatusWithTime);
 
         // If more dose times on same day update the time to be the same date, but have the hours and minutes of the next dose
         if (timeIndex + 1 < this.timesOfDoses.length) {
@@ -198,6 +210,6 @@ Date.prototype.isEqualDate = function (otherDate: Date): boolean {
   );
 };
 
-export { DoseStatus, DoseStatusWithTime };
+export { DoseStatus };
 
 export default Medication;
