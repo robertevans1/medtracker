@@ -2,10 +2,14 @@ import React from "react";
 import { Button, Text, View, useColorScheme } from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { MedicationController } from "../context/medication_context";
+import { useNavigation } from "@react-navigation/native";
+import ParamList from "../../navigation/routes";
+
 import Medication, {
   DoseStatus,
   DoseStatusType,
 } from "../../domain/medication";
+import MedicationScreen from "../../medication_screen/ui/medication_screen";
 
 function MedicationCard({
   medicationController,
@@ -19,6 +23,8 @@ function MedicationCard({
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  const navigation = useNavigation();
 
   const previousStatus = medication.getPreviousStatusWithTime();
   const nextStatus = medication.getNextStatusWithTime();
@@ -51,9 +57,16 @@ function MedicationCard({
         {" Next: "}
         {medication.getNextStatusWithTime()?.toString()}
       </Text>
+
       <Button
-        title="Delete"
-        onPress={() => medicationController.removeMedication(medication.id!)}
+        title="View"
+        onPress={() => {
+          console.log(
+            "Navigating to MedicationScreen with medication   ",
+            medication
+          );
+          return navigation.navigate("Medication", { medication: medication });
+        }}
       />
     </View>
   );

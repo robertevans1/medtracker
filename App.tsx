@@ -1,21 +1,21 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Home from "./home/home_screen";
+import MedicationScreen from "./medication_screen/ui/medication_screen";
+import { MedicationProvider } from "./dashboard/context/medication_context";
+import HomeScreen from "./home/home_screen";
 
-import React from 'react';
-
-import Home from './home/home';
-import {NavigationContainer} from '@react-navigation/native';
-import {MedicationProvider} from './dashboard/context/medication_context';
+const Stack = createStackNavigator();
 
 function App(): React.JSX.Element {
   return (
     <MedicationProvider>
       <NavigationContainer>
-        <Home />
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Medication" component={MedicationScreen} />
+        </Stack.Navigator>
       </NavigationContainer>
     </MedicationProvider>
   );

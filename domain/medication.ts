@@ -24,7 +24,50 @@ class DoseStatus {
   toString(): string {
     return `${this.type} ${this.date}`;
   }
+
+  toJSON(): any {
+    return {
+      type: this.type,
+      index: this.index,
+      date: this.date?.toISOString()
+    };
+  }
+
+  static fromJSON(json: any): DoseStatus {
+    return new DoseStatus({
+      type: json.type,
+      index: json.index,
+      date: json.date ? new Date(json.date) : undefined
+    });
+  }
 }
+
+const setTime = (date: Date, hours: number, minutes: number): Date => {
+  const newDate = new Date(date);
+  newDate.setHours(hours);
+  newDate.setMinutes(minutes);
+  return newDate;
+};
+
+// Update time based on the next dose time
+const updateTime = (currentDate: Date, nextDoseTime: Date | null, timesOfDoses: Array<Date>): Date => {
+  if (nextDoseTime) {
+    return setTime(
+      currentDate,
+      nextDoseTime.getHours(),
+      nextDoseTime.getMinutes()
+    );
+  } else {
+    // If no more dose times on the same day, update the time to be the next day with the hours and minutes of the first dose
+    const nextDay = new Date(currentDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return setTime(
+      nextDay,
+      timesOfDoses[0].getHours(),
+      timesOfDoses[0].getMinutes()
+    );
+  }
+};
 
 class Medication {
   id?: number;
@@ -98,8 +141,6 @@ class Medication {
     return null;
   }
 
-
-
   getNextStatusWithTime(): DoseStatus | null {
     const doseStatusesWithTime = this.getDoseStatusesWithTime();
     const now = new Date();
@@ -158,42 +199,15 @@ class Medication {
 
         // If more dose times on same day update the time to be the same date, but have the hours and minutes of the next dose
         if (timeIndex + 1 < this.timesOfDoses.length) {
-          time = this.updateTime(time, this.timesOfDoses[timeIndex + 1]);
+          time = updateTime(time, this.timesOfDoses[timeIndex + 1], this.timesOfDoses);
         } else {
-          time = this.updateTime(time, null);
+          time = updateTime(time, null, this.timesOfDoses);
         }
       }
     }
 
     return doseStatusesWithTime;
   }
-
-  setTime = (date: Date, hours: number, minutes: number): Date => {
-    const newDate = new Date(date);
-    newDate.setHours(hours);
-    newDate.setMinutes(minutes);
-    return newDate;
-  };
-
-  // Update time based on the next dose time
-  updateTime = (currentDate: Date, nextDoseTime: Date | null): Date => {
-    if (nextDoseTime) {
-      return this.setTime(
-        currentDate,
-        nextDoseTime.getHours(),
-        nextDoseTime.getMinutes()
-      );
-    } else {
-      // If no more dose times on the same day, update the time to be the next day with the hours and minutes of the first dose
-      const nextDay = new Date(currentDate);
-      nextDay.setDate(nextDay.getDate() + 1);
-      return this.setTime(
-        nextDay,
-        this.timesOfDoses[0].getHours(),
-        this.timesOfDoses[0].getMinutes()
-      );
-    }
-  };
 }
 
 declare global {

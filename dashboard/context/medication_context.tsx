@@ -103,5 +103,7 @@ export const MedicationProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useMedications = () => useContext(MedicationContext);
 
 const fetchMedicationsFromRepository = async () => {
-  return repository.fetchMedicationsForUser("1");
+  let medications = await repository.fetchMedicationsForUser("1");
+  console.log("Fetched medications are:", medications);
+  return medications;
 };
